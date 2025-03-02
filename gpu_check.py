@@ -34,10 +34,5 @@ if __name__ == "__main__":
         print("\nYour GPU should work fine with the program.")
         print("Run your script with: python research/PromptSinger/generate.py")
     else:
-        print("\nGPU check failed. Here are some troubleshooting steps:")
-        print("1. Make sure your GPU drivers are updated")
-        print("2. Ensure you have a compatible version of PyTorch with CUDA support")
-        print("3. Consider reinstalling PyTorch with CUDA support using:")
-        print("   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
-        print("   (replace cu118 with your CUDA version if different)")
+        print("\nGPU check failed. Sorry to see this...")
         print("\nFor now, your program will continue to run on CPU, but it will be very slow.") 
