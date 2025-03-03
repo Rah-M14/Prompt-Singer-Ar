@@ -34,8 +34,19 @@ def inference(a, h):
     state_dict_g = load_checkpoint(a.checkpoint_file, device)
     generator.load_state_dict(state_dict_g['generator'])
 
-    input_file = open(a.input_code_file)
-    input_lines = input_file.readlines()
+    try:
+        input_file = open(a.input_code_file, 'r', encoding='utf-8')
+        input_lines = input_file.readlines()
+    except UnicodeDecodeError:
+        print("UTF-8 encoding failed, trying UTF-16...")
+        input_file = open(a.input_code_file, 'r', encoding='utf-16')
+        input_lines = input_file.readlines()
+    except UnicodeDecodeError:
+        print("UTF-16 encoding failed, trying Latin-1 as fallback...")
+        input_file = open(a.input_code_file, 'r', encoding='latin-1')
+        input_lines = input_file.readlines()
+    finally:
+        input_file.close()
     
     os.makedirs(a.output_dir, exist_ok=True)
 
@@ -103,8 +114,57 @@ def main():
     a = parser.parse_args()
 
     config_file = os.path.join(os.path.dirname(a.checkpoint_file), 'config.json')
-    with open(config_file) as f:
-        data = f.read()
+    
+    if not os.path.exists(config_file):
+        print(f"Warning: Config file {config_file} not found.")
+        print("Creating a default config.json file...")
+        
+        default_config = {
+            "resblock": "1",
+            "num_gpus": 1,
+            "batch_size": 16,
+            "learning_rate": 0.0002,
+            "adam_b1": 0.8,
+            "adam_b2": 0.99,
+            "lr_decay": 0.999,
+            "seed": 1234,
+            "upsample_rates": [5, 4, 2, 2],
+            "upsample_kernel_sizes": [10, 8, 4, 4],
+            "upsample_initial_channel": 512,
+            "resblock_kernel_sizes": [3, 7, 11],
+            "resblock_dilation_sizes": [[1, 3, 5], [1, 3, 5], [1, 3, 5]],
+            "segment_size": 8192,
+            "num_mels": 80,
+            "num_freq": 1025,
+            "n_fft": 1024,
+            "hop_size": 256,
+            "win_size": 1024,
+            "sampling_rate": 24000,
+            "fmin": 0,
+            "fmax": 8000,
+            "fmax_for_loss": None,
+            "num_workers": 4,
+            "dist_config": {
+                "dist_backend": "nccl",
+                "dist_url": "tcp://localhost:54321",
+                "world_size": 1
+            }
+        }
+        
+        os.makedirs(os.path.dirname(config_file), exist_ok=True)
+        
+        with open(config_file, 'w') as f:
+            json.dump(default_config, f, indent=4)
+        
+        print(f"Default config created at {config_file}")
+    
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            data = f.read()
+    except UnicodeDecodeError:
+        print("UTF-8 encoding failed when reading config, trying Latin-1...")
+        with open(config_file, 'r', encoding='latin-1') as f:
+            data = f.read()
 
     global h
     json_config = json.loads(data)

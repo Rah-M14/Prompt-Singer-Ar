@@ -1,7 +1,8 @@
 conda create -n myenv python==3.8
-pip install --editable ./ (keep running this till everything is installed)
+pip install --editable ./ (Re-run this till everything is installed)
 pip install einops
 conda install pytorch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 pytorch-cuda=12.4 -c pytorch -c nvidia
+pip install matplotlib
 
 # When You're on Windows, to run with GPU use the following bat files. Just for safety, clear the cache (Especially when You're used to having multiple tabs open!😂)
 
@@ -12,3 +13,6 @@ conda install pytorch==2.4.1 torchvision==0.19.1 torchaudio==2.4.1 pytorch-cuda=
 
 python research/PromptSinger/generate.py  infer_tsv --task t2a_sing_t5_config_task --path Hugging\prompt-singer-flant5-large-finetuned\checkpoint_last.pt --gen-subset Gender_female_Volume_high --batch-size 1 --max-tokens 10000 --max-source-positions 10000 --max-target-positions 10000 --max-len-a 1 --max-len-b 0 --results-path output --user-dir research --fp16  --num-workers 0
 
+
+# Txt to waveform, you can run it from the root straight on!
+.\run_waveform_gen.bat

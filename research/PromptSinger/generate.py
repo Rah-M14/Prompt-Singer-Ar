@@ -337,6 +337,8 @@ def _main(cfg: DictConfig, output_file):
                     "If you are using BPE on the target side, the BLEU score is computed on BPE tokens, not on proper words.  Use --sacrebleu for standard 13a BLEU tokenization"
                 )
 
+    logger.info(f"Processing subset: {cfg.dataset.gen_subset} with {num_sentences} items")
+
     return scorer
 
 
